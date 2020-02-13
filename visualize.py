@@ -17,12 +17,14 @@ def get_args():
     """ Defines training-specific hyper-parameters. """
     parser = argparse.ArgumentParser('Sequence to Sequence Model')
     # Add data arguments
-    parser.add_argument('--data', default='europarl_prepared', help='path to data directory')
+    parser.add_argument('--data', default='europarl_prepared',
+                        help='path to data directory')
     parser.add_argument('--source-lang', default='de', help='source language')
     parser.add_argument('--target-lang', default='en', help='target language')
     parser.add_argument('--checkpoint-path', default='checkpoints/checkpoint_best.pt',
                         help='path to the model file')
-    parser.add_argument('--vis-dir', default='visualizations', help='path to the model file')
+    parser.add_argument('--vis-dir', default='visualizations',
+                        help='path to the model file')
     return parser.parse_args()
 
 
@@ -30,15 +32,20 @@ def main(args):
     """ Main function. Visualises attention weight arrays as nifty heat-maps. """
 
     torch.manual_seed(42)
-    state_dict = torch.load(args.checkpoint_path, map_location=lambda s, l: default_restore_location(s, 'cpu'))
+    state_dict = torch.load(
+        args.checkpoint_path, map_location=lambda s, l: default_restore_location(s, 'cpu'))
     args = argparse.Namespace(**{**vars(args), **vars(state_dict['args'])})
     utils.init_logging(args)
 
     # Load dictionaries
-    src_dict = Dictionary.load(os.path.join(args.data, 'dict.{:s}'.format(args.source_lang)))
-    print('Loaded a source dictionary ({:s}) with {:d} words'.format(args.source_lang, len(src_dict)))
-    tgt_dict = Dictionary.load(os.path.join(args.data, 'dict.{:s}'.format(args.target_lang)))
-    print('Loaded a target dictionary ({:s}) with {:d} words'.format(args.target_lang, len(tgt_dict)))
+    src_dict = Dictionary.load(os.path.join(
+        args.data, 'dict.{:s}'.format(args.source_lang)))
+    print('Loaded a source dictionary ({:s}) with {:d} words'.format(
+        args.source_lang, len(src_dict)))
+    tgt_dict = Dictionary.load(os.path.join(
+        args.data, 'dict.{:s}'.format(args.target_lang)))
+    print('Loaded a target dictionary ({:s}) with {:d} words'.format(
+        args.target_lang, len(tgt_dict)))
 
     # Load dataset
     test_dataset = Seq2SeqDataset(
@@ -65,7 +72,8 @@ def main(args):
             continue
 
         # Perform forward pass
-        output, attn_weights = model(sample['src_tokens'], sample['src_lengths'], sample['tgt_inputs'])
+        output, attn_weights = model(
+            sample['src_tokens'], sample['src_lengths'], sample['tgt_inputs'])
         attn_records.append((sample, attn_weights))
 
         # Only visualize the first 10 sentence pairs
@@ -95,11 +103,13 @@ def main(args):
         sns.heatmap(attn_df, cmap='Blues', linewidths=0.25, vmin=0.0, vmax=1.0, xticklabels=True, yticklabels=True,
                     fmt='.3f')
         plt.yticks(rotation=0)
-        plot_path = os.path.join(args.vis_dir, 'sentence_{:d}.png'.format(record_id))
+        plot_path = os.path.join(
+            args.vis_dir, 'sentence_{:d}.png'.format(record_id))
         plt.savefig(plot_path, dpi='figure', pad_inches=1, bbox_inches='tight')
         plt.clf()
 
-    print('Done! Visualised attention maps have been saved to the \'{:s}\' directory!'.format(args.vis_dir))
+    print('Done! Visualised attention maps have been saved to the \'{:s}\' directory!'.format(
+        args.vis_dir))
 
 
 if __name__ == '__main__':

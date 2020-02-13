@@ -19,34 +19,48 @@ def get_args():
     parser = argparse.ArgumentParser('Sequence to Sequence Model')
 
     # Add data arguments
-    parser.add_argument('--data', default='europarl_prepared', help='path to data directory')
+    parser.add_argument('--data', default='europarl_prepared',
+                        help='path to data directory')
     parser.add_argument('--source-lang', default='de', help='source language')
     parser.add_argument('--target-lang', default='en', help='target language')
-    parser.add_argument('--max-tokens', default=None, type=int, help='maximum number of tokens in a batch')
-    parser.add_argument('--batch-size', default=10, type=int, help='maximum number of sentences in a batch')
-    parser.add_argument('--train-on-tiny', action='store_true', help='train model on a tiny dataset')
+    parser.add_argument('--max-tokens', default=None, type=int,
+                        help='maximum number of tokens in a batch')
+    parser.add_argument('--batch-size', default=10, type=int,
+                        help='maximum number of sentences in a batch')
+    parser.add_argument('--train-on-tiny', action='store_true',
+                        help='train model on a tiny dataset')
 
     # Add model arguments
-    parser.add_argument('--arch', default='lstm', choices=ARCH_MODEL_REGISTRY.keys(), help='model architecture')
+    parser.add_argument('--arch', default='lstm',
+                        choices=ARCH_MODEL_REGISTRY.keys(), help='model architecture')
 
     # Add optimization arguments
-    parser.add_argument('--max-epoch', default=100, type=int, help='force stop training at specified epoch')
-    parser.add_argument('--clip-norm', default=4.0, type=float, help='clip threshold of gradients')
-    parser.add_argument('--lr', default=0.0003, type=float, help='learning rate')
+    parser.add_argument('--max-epoch', default=100, type=int,
+                        help='force stop training at specified epoch')
+    parser.add_argument('--clip-norm', default=4.0,
+                        type=float, help='clip threshold of gradients')
+    parser.add_argument('--lr', default=0.0003,
+                        type=float, help='learning rate')
     parser.add_argument('--patience', default=10, type=int,
                         help='number of epochs without improvement on validation set before early stopping')
 
     # Add checkpoint arguments
     parser.add_argument('--log-file', default=None, help='path to save logs')
-    parser.add_argument('--save-dir', default='checkpoints', help='path to save checkpoints')
-    parser.add_argument('--restore-file', default='checkpoint_last.pt', help='filename to load checkpoint')
-    parser.add_argument('--save-interval', type=int, default=1, help='save a checkpoint every N epochs')
-    parser.add_argument('--no-save', action='store_true', help='don\'t save models or checkpoints')
-    parser.add_argument('--epoch-checkpoints', action='store_true', help='store all epoch checkpoints')
+    parser.add_argument('--save-dir', default='checkpoints',
+                        help='path to save checkpoints')
+    parser.add_argument('--restore-file', default='checkpoint_last.pt',
+                        help='filename to load checkpoint')
+    parser.add_argument('--save-interval', type=int, default=1,
+                        help='save a checkpoint every N epochs')
+    parser.add_argument('--no-save', action='store_true',
+                        help='don\'t save models or checkpoints')
+    parser.add_argument('--epoch-checkpoints',
+                        action='store_true', help='store all epoch checkpoints')
 
     # Parse twice as model arguments are not known the first time
     args, _ = parser.parse_known_args()
-    model_parser = parser.add_argument_group(argument_default=argparse.SUPPRESS)
+    model_parser = parser.add_argument_group(
+        argument_default=argparse.SUPPRESS)
     ARCH_MODEL_REGISTRY[args.arch].add_args(model_parser)
     args = parser.parse_args()
     ARCH_CONFIG_REGISTRY[args.arch](args)
@@ -63,25 +77,34 @@ def main(args):
     utils.init_logging(args)
 
     # Load dictionaries
-    src_dict = Dictionary.load(os.path.join(args.data, 'dict.{:s}'.format(args.source_lang)))
-    logging.info('Loaded a source dictionary ({:s}) with {:d} words'.format(args.source_lang, len(src_dict)))
-    tgt_dict = Dictionary.load(os.path.join(args.data, 'dict.{:s}'.format(args.target_lang)))
-    logging.info('Loaded a target dictionary ({:s}) with {:d} words'.format(args.target_lang, len(tgt_dict)))
+    src_dict = Dictionary.load(os.path.join(
+        args.data, 'dict.{:s}'.format(args.source_lang)))
+    logging.info('Loaded a source dictionary ({:s}) with {:d} words'.format(
+        args.source_lang, len(src_dict)))
+    tgt_dict = Dictionary.load(os.path.join(
+        args.data, 'dict.{:s}'.format(args.target_lang)))
+    logging.info('Loaded a target dictionary ({:s}) with {:d} words'.format(
+        args.target_lang, len(tgt_dict)))
 
     # Load datasets
     def load_data(split):
         return Seq2SeqDataset(
-            src_file=os.path.join(args.data, '{:s}.{:s}'.format(split, args.source_lang)),
-            tgt_file=os.path.join(args.data, '{:s}.{:s}'.format(split, args.target_lang)),
+            src_file=os.path.join(
+                args.data, '{:s}.{:s}'.format(split, args.source_lang)),
+            tgt_file=os.path.join(
+                args.data, '{:s}.{:s}'.format(split, args.target_lang)),
             src_dict=src_dict, tgt_dict=tgt_dict)
 
-    train_dataset = load_data(split='train') if not args.train_on_tiny else load_data(split='tiny_train')
+    train_dataset = load_data(
+        split='train') if not args.train_on_tiny else load_data(split='tiny_train')
     valid_dataset = load_data(split='valid')
 
     # Build model and optimization criterion
     model = models.build_model(args, src_dict, tgt_dict)
-    logging.info('Built a model with {:d} parameters'.format(sum(p.numel() for p in model.parameters())))
-    criterion = nn.CrossEntropyLoss(ignore_index=src_dict.pad_idx, reduction='sum')
+    logging.info('Built a model with {:d} parameters'.format(
+        sum(p.numel() for p in model.parameters())))
+    criterion = nn.CrossEntropyLoss(
+        ignore_index=src_dict.pad_idx, reduction='sum')
 
     # Instantiate optimizer and learning rate scheduler
     optimizer = torch.optim.Adam(model.parameters(), args.lr)
@@ -108,11 +131,18 @@ def main(args):
         stats['grad_norm'] = 0
         stats['clip'] = 0
         # Display progress
-        progress_bar = tqdm(train_loader, desc='| Epoch {:03d}'.format(epoch), leave=False, disable=False)
+        progress_bar = tqdm(train_loader, desc='| Epoch {:03d}'.format(
+            epoch), leave=False, disable=False)
+
+        if torch.cuda.is_available():
+            model = model.cuda()
 
         # Iterate over the training set
         for i, sample in enumerate(progress_bar):
-
+            if torch.cuda.is_available():
+                for k in sample:
+                    if type(sample[k]) == torch.Tensor:
+                        sample[k] = sample[k].cuda()
             if len(sample) == 0:
                 continue
             model.train()
@@ -121,19 +151,24 @@ def main(args):
             ___QUESTION-1-DESCRIBE-F-START___
             Describe what the following lines of code do.
             '''
-            output, _ = model(sample['src_tokens'], sample['src_lengths'], sample['tgt_inputs'])
+            output, _ = model(sample['src_tokens'],
+                              sample['src_lengths'], sample['tgt_inputs'])
 
             loss = \
-                criterion(output.view(-1, output.size(-1)), sample['tgt_tokens'].view(-1)) / len(sample['src_lengths'])
+                criterion(output.view(-1, output.size(-1)),
+                          sample['tgt_tokens'].view(-1)) / len(sample['src_lengths'])
             loss.backward()
-            grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_norm)
+            grad_norm = torch.nn.utils.clip_grad_norm_(
+                model.parameters(), args.clip_norm)
             optimizer.step()
             optimizer.zero_grad()
             '''___QUESTION-1-DESCRIBE-F-END___'''
 
             # Update statistics for progress bar
-            total_loss, num_tokens, batch_size = loss.item(), sample['num_tokens'], len(sample['src_tokens'])
-            stats['loss'] += total_loss * len(sample['src_lengths']) / sample['num_tokens']
+            total_loss, num_tokens, batch_size = loss.item(
+            ), sample['num_tokens'], len(sample['src_tokens'])
+            stats['loss'] += total_loss * \
+                len(sample['src_lengths']) / sample['num_tokens']
             stats['lr'] += optimizer.param_groups[0]['lr']
             stats['num_tokens'] += num_tokens / len(sample['src_tokens'])
             stats['batch_size'] += batch_size
@@ -146,12 +181,14 @@ def main(args):
             value / len(progress_bar)) for key, value in stats.items())))
 
         # Calculate validation loss
-        valid_perplexity = validate(args, model, criterion, valid_dataset, epoch)
+        valid_perplexity = validate(
+            args, model, criterion, valid_dataset, epoch)
         model.train()
 
         # Save checkpoints
         if epoch % args.save_interval == 0:
-            utils.save_checkpoint(args, model, optimizer, epoch, valid_perplexity)  # lr_scheduler
+            utils.save_checkpoint(args, model, optimizer,
+                                  epoch, valid_perplexity)  # lr_scheduler
 
         # Check whether to terminate training
         if valid_perplexity < best_validate:
@@ -160,7 +197,8 @@ def main(args):
         else:
             bad_epochs += 1
         if bad_epochs >= args.patience:
-            logging.info('No validation set improvements observed for {:d} epochs. Early stop!'.format(args.patience))
+            logging.info(
+                'No validation set improvements observed for {:d} epochs. Early stop!'.format(args.patience))
             break
 
 
@@ -180,10 +218,17 @@ def validate(args, model, criterion, valid_dataset, epoch):
     for i, sample in enumerate(valid_loader):
         if len(sample) == 0:
             continue
+
+        if torch.cuda.is_available():
+            for k in sample:
+                if type(sample[k]) == torch.Tensor:
+                    sample[k] = sample[k].cuda()
         with torch.no_grad():
             # Compute loss
-            output, attn_scores = model(sample['src_tokens'], sample['src_lengths'], sample['tgt_inputs'])
-            loss = criterion(output.view(-1, output.size(-1)), sample['tgt_tokens'].view(-1))
+            output, attn_scores = model(
+                sample['src_tokens'], sample['src_lengths'], sample['tgt_inputs'])
+            loss = criterion(output.view(-1, output.size(-1)),
+                             sample['tgt_tokens'].view(-1))
         # Update tracked statistics
         stats['valid_loss'] += loss.item()
         stats['num_tokens'] += sample['num_tokens']
