@@ -33,6 +33,7 @@ def get_args():
     # Add model arguments
     parser.add_argument('--arch', default='lstm',
                         choices=ARCH_MODEL_REGISTRY.keys(), help='model architecture')
+    parser.add_argument('--cuda', default=False, help='Use a GPU')
 
     # Add optimization arguments
     parser.add_argument('--max-epoch', default=100, type=int,
@@ -57,6 +58,8 @@ def get_args():
     parser.add_argument('--epoch-checkpoints',
                         action='store_true', help='store all epoch checkpoints')
 
+    parser.add_argument('--play', default=False,
+                        help='If true, use smaller dataset to run faster')
     # Parse twice as model arguments are not known the first time
     args, _ = parser.parse_known_args()
     model_parser = parser.add_argument_group(
@@ -106,6 +109,8 @@ def main(args):
     criterion = nn.CrossEntropyLoss(
         ignore_index=src_dict.pad_idx, reduction='sum')
 
+    if torch.cuda.is_available() and args.cuda:
+        model = model.cuda()
     # Instantiate optimizer and learning rate scheduler
     optimizer = torch.optim.Adam(model.parameters(), args.lr)
 
@@ -134,12 +139,11 @@ def main(args):
         progress_bar = tqdm(train_loader, desc='| Epoch {:03d}'.format(
             epoch), leave=False, disable=False)
 
-        if torch.cuda.is_available():
-            model = model.cuda()
-
         # Iterate over the training set
         for i, sample in enumerate(progress_bar):
-            if torch.cuda.is_available():
+            if args.play and i > 10:
+                break
+            if torch.cuda.is_available() and args.cuda:
                 for k in sample:
                     if type(sample[k]) == torch.Tensor:
                         sample[k] = sample[k].cuda()
@@ -213,13 +217,14 @@ def validate(args, model, criterion, valid_dataset, epoch):
     stats['valid_loss'] = 0
     stats['num_tokens'] = 0
     stats['batch_size'] = 0
-
+    if torch.cuda.is_available() and args.cuda:
+        model = model.cuda()
     # Iterate over the validation set
     for i, sample in enumerate(valid_loader):
         if len(sample) == 0:
             continue
 
-        if torch.cuda.is_available():
+        if torch.cuda.is_available() and args.cuda:
             for k in sample:
                 if type(sample[k]) == torch.Tensor:
                     sample[k] = sample[k].cuda()
