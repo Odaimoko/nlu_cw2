@@ -1,0 +1,28 @@
+
+
+
+How many word tokens are in the English data? In the German data? Give both the total count and the number of word types in each language.
+
+total count of English training data: 124111.  Number of types: 8329
+total count of German training data: 112621.  Number of types: 12505
+
+
+
+How many word tokens will be replaced by <UNK> in English? In German? Sub- sequently, what will the total vocabulary size be?
+
+In English, 3910 words will be replaced by <UNK>. Total vocabulary size would be 4420 .
+In German, 7460 words will be replaced by <UNK>. Total vocabulary size would be 5046 .
+
+
+
+Is there a specific type of word which will be commonly replaced? Give an example of...
+English: 
+['equipped', 'submitting', 'communautaire', 'attempts', 'recognising', 'gothic', 'penetration', 'furs', 'tube', 'amply']
+German: 
+['sammelsurium', 'demütigend', 'fels', 'geehrter', 'goya', 'beitrittsländer', 'branchen', 'papst', 'herzegowina', 'ausgangssituation']
+
+
+
+How many vocabulary tokens are the same between both languages? How could we exploit this similarity in our model? 
+
+1461 words are the same between two language.
