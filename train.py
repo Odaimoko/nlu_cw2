@@ -154,6 +154,14 @@ def main(args):
             '''
             ___QUESTION-1-DESCRIBE-F-START___
             Describe what the following lines of code do.
+            
+            Answer: 
+            Using model to compute the output.
+            computing loss (cross entropy) based on output and target
+            Doing back-propagation depends on loss to compute gradients of params.
+            normalising gradients to prevent gradient vanishing or explode
+            updating one step
+            clear gradients.
             '''
             output, _ = model(sample['src_tokens'],
                               sample['src_lengths'], sample['tgt_inputs'])

@@ -165,6 +165,20 @@ class LSTMEncoder(Seq2SeqEncoder):
         Describe what happens when self.bidirectional is set to True. 
         What is the difference between final_hidden_states and final_cell_states?
         '''
+        '''
+                Answer:
+                h_n of shape (num_layers * num_directions, batch, hidden_size)
+                c_n of shape (num_layers * num_directions, batch, hidden_size)
+
+                to separate two directions state ==>
+
+                h_n of shape (num_layers, batch, hidden_size * num_directions)
+                c_n of shape (num_layers, batch, hidden_size * num_directions)
+
+                cell_states represents state of storage cell
+                hidden_states represents state of hidden layer units
+        '''
+
         if self.bidirectional:
             def combine_directions(outs):
                 return torch.cat([outs[0: outs.size(0): 2], outs[1: outs.size(0): 2]], dim=2)
@@ -205,6 +219,12 @@ class AttentionLayer(nn.Module):
         '''
         ___QUESTION-1-DESCRIBE-B-START___
         Describe how the attention context vector is calculated. Why do we need to apply a mask to the attention scores?
+        
+        Answer:
+        unsqueeze: src_mask shape: [src_time_steps, batch_size] --> [src_time_steps,1 , batch_size]
+        mask as '-inf', softmax make it nealy 0
+        avoid model simply copy the next word when predict.
+        
         '''
         if src_mask is not None:
             src_mask = src_mask.unsqueeze(dim=1)
@@ -226,6 +246,16 @@ class AttentionLayer(nn.Module):
         ___QUESTION-1-DESCRIBE-C-START___
         How are attention scores calculated? What role does matrix multiplication (i.e. torch.bmm()) play 
         in aligning encoder and decoder representations?
+        
+        Answer:
+        scr_projection: Linear layer
+        
+        transpose: shape of encoder_out 
+        [batch_size, src_time_steps, output_dims] --> [batch_size, output_dims, src_time_steps]
+        
+        bmm:
+        for each item in batch: do [1, input_dims]*[output_dims, src_time_steps]
+        
         '''
         projected_encoder_out = self.src_projection(
             encoder_out).transpose(2, 1)
@@ -308,6 +338,10 @@ class LSTMDecoder(Seq2SeqDecoder):
         '''
         ___QUESTION-1-DESCRIBE-D-START___
         Describe how the decoder state is initialized. When is cached_state == None? What role does input_feed play?
+        
+        Ansewr:
+        When cached_state == None, all hidden_units and cell_units will set to zero.
+        input_feed the previous prediction, so model can depend on all input and previous predictions to predict.
         '''
         cached_state = utils.get_incremental_state(
             self, incremental_state, 'cached_state')
@@ -353,6 +387,13 @@ class LSTMDecoder(Seq2SeqDecoder):
             ___QUESTION-1-DESCRIBE-E-START___
             How is attention integrated into the decoder? Why is the attention function given the previous 
             target state as one of its inputs? What is the purpose of the dropout layer?
+            
+            Answer:
+            Attention of decoder gives a weight to all input_hidden_states and previous target state.
+            
+            Because decoder should condition on previous prediction to predict.
+            
+            Avoid over-fitting.
             '''
             if self.attention is None:
                 input_feed = tgt_hidden_states[-1]
