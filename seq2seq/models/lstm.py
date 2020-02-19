@@ -444,8 +444,6 @@ class LSTMDecoder(Seq2SeqDecoder):
             # print(lexical_contexts.shape)
             decoder_output += self.Lexical_add(lexical_contexts)
             # TODO: --------------------------------------------------------------------- /CUT
-
-
         return decoder_output, attn_weights
 
 
