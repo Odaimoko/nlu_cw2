@@ -410,7 +410,7 @@ class LSTMDecoder(Seq2SeqDecoder):
                     for i in range(src_embeddings.shape[0]):
                         # print(step_attn_weights[:,i].shape)
                         # print(src_embeddings[i].shape)
-                        weight_sum += step_attn_weights[:,i].matmul(src_embeddings[i])
+                        weight_sum += step_attn_weights[:,i].repeat(src_embeddings.shape[2],1).transpose(1,0)*src_embeddings[i]
                     flt = torch.tanh(weight_sum)
 
                     htl = torch.tanh(self.Lexical_FFNN(flt))+flt
