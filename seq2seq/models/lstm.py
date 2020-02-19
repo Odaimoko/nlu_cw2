@@ -407,9 +407,12 @@ class LSTMDecoder(Seq2SeqDecoder):
                     # __QUESTION-5: Compute and collect LEXICAL MODEL context vectors here
                     # TODO: --------------------------------------------------------------------- CUT
                     weight_sum = torch.zeros((src_embeddings.shape[1],src_embeddings.shape[2]))
+                    if torch.cuda.is_available():
+                        weight_sum = weight_sum.cuda()
                     for i in range(src_embeddings.shape[0]):
                         # print(step_attn_weights[:,i].shape)
                         # print(src_embeddings[i].shape)
+
                         weight_sum += step_attn_weights[:,i].repeat(src_embeddings.shape[2],1).transpose(1,0)*src_embeddings[i]
                     flt = torch.tanh(weight_sum)
 
