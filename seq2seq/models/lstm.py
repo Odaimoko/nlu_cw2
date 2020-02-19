@@ -308,7 +308,8 @@ class LSTMDecoder(Seq2SeqDecoder):
         if self.use_lexical_model:
             # __QUESTION-5: Add parts of decoder architecture corresponding to the LEXICAL MODEL here
             # TODO: --------------------------------------------------------------------- CUT
-            pass
+            self.Lexical_FFNN = nn.Linear(embed_dim, embed_dim)
+            self.Lexical_add = nn.Linear(embed_dim, len(dictionary))
             # TODO: --------------------------------------------------------------------- /CUT
 
     def forward(self, tgt_inputs, encoder_out, incremental_state=None):
@@ -405,7 +406,15 @@ class LSTMDecoder(Seq2SeqDecoder):
                 if self.use_lexical_model:
                     # __QUESTION-5: Compute and collect LEXICAL MODEL context vectors here
                     # TODO: --------------------------------------------------------------------- CUT
-                    pass
+                    weight_sum = torch.zeros((src_embeddings.shape[1],src_embeddings.shape[2]))
+                    for i in range(src_embeddings.shape[0]):
+                        # print(step_attn_weights[:,i].shape)
+                        # print(src_embeddings[i].shape)
+                        weight_sum += step_attn_weights[:,i].matmul(src_embeddings[i])
+                    flt = torch.tanh(weight_sum)
+
+                    htl = torch.tanh(self.Lexical_FFNN(flt))+flt
+                    lexical_contexts.append(htl)
                     # TODO: --------------------------------------------------------------------- /CUT
 
             input_feed = F.dropout(
@@ -430,7 +439,10 @@ class LSTMDecoder(Seq2SeqDecoder):
         if self.use_lexical_model:
             # __QUESTION-5: Incorporate the LEXICAL MODEL into the prediction of target tokens here
             # TODO: --------------------------------------------------------------------- CUT
-            pass
+            lexical_contexts = torch.stack(lexical_contexts).transpose(1,0)
+            # print(decoder_output.shape)
+            # print(lexical_contexts.shape)
+            decoder_output += self.Lexical_add(lexical_contexts)
             # TODO: --------------------------------------------------------------------- /CUT
 
         return decoder_output, attn_weights
