@@ -26,3 +26,5 @@ German:
 How many vocabulary tokens are the same between both languages? How could we exploit this similarity in our model? 
 
 1461 words are the same between two language.
+average length of English sentences is 12.4111 .
+average length of German sentences is 11.2621 .

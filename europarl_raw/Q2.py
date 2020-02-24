@@ -19,7 +19,12 @@ def compute_data(data):
                 data_dict[word] = 1
     return data_dict
 
-
+def count_sent_length(data):
+    length = 0
+    num = len(data)
+    for item in data:
+        length += len(item.replace('\n','').split(' '))
+    return length/num
 en_dict = compute_data(train_en)
 de_dict = compute_data(train_de)
 
@@ -56,5 +61,9 @@ print('How many vocabulary tokens are the same between both languages? How could
 
 en_wordset = set(en_dict.keys())
 de_wordset = set(de_dict.keys())
-print('{} words are the same between two language.'.format(
-    len(en_wordset.intersection(de_wordset))))
+print('{} words are the same between two language.'.format(len(en_wordset.intersection(de_wordset))))
+
+l_en = count_sent_length(train_en)
+l_de = count_sent_length(train_de)
+print('average length of English sentences is {} .'.format(l_en))
+print('average length of German sentences is {} .'.format(l_de))
