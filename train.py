@@ -58,8 +58,6 @@ def get_args():
     parser.add_argument('--epoch-checkpoints',
                         action='store_true', help='store all epoch checkpoints')
 
-    parser.add_argument('--play', default=False,
-                        help='If true, use smaller dataset to run faster')
     # Parse twice as model arguments are not known the first time
     args, _ = parser.parse_known_args()
     model_parser = parser.add_argument_group(
@@ -141,8 +139,6 @@ def main(args):
 
         # Iterate over the training set
         for i, sample in enumerate(progress_bar):
-            if args.play and i > 10:
-                break
             if torch.cuda.is_available() and args.cuda:
                 for k in sample:
                     if type(sample[k]) == torch.Tensor:
