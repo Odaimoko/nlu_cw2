@@ -135,3 +135,5 @@ results/
 .DS_Store
 *.ipynb
 example.sh
+checkpoints/*
+play.sh

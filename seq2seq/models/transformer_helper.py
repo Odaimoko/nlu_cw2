@@ -28,6 +28,8 @@ class TransformerEncoderLayer(nn.Module):
         """Forward pass of a single Transformer Encoder Layer"""
         residual = state.clone()
 
+        
+        # ___QUESTION-7-DESCRIBE-D-START___
         '''
         ___QUESTION-7-DESCRIBE-D-START___
         What is the purpose of encoder_padding_mask? What will the output shape of `state' Tensor 
@@ -38,6 +40,8 @@ class TransformerEncoderLayer(nn.Module):
         '''
         ___QUESTION-7-DESCRIBE-D-END___
         '''
+                
+
 
         state = F.dropout(state, p=self.dropout, training=self.training)
         state += residual
@@ -111,6 +115,8 @@ class TransformerDecoderLayer(nn.Module):
         state = self.self_attn_layer_norm(state)
 
         residual = state.clone()
+        
+        # ___QUESTION-7-DESCRIBE-E-START___
         '''
         ___QUESTION-7-DESCRIBE-E-START___
         How does encoder attention differ from self attention? What is the difference between key_padding_mask 
@@ -124,6 +130,8 @@ class TransformerDecoderLayer(nn.Module):
         '''
         ___QUESTION-7-DESCRIBE-E-END___
         '''
+                
+
 
         state = F.dropout(state, p=self.dropout, training=self.training)
         state += residual
@@ -197,6 +205,8 @@ class MultiHeadAttention(nn.Module):
         tgt_time_steps, batch_size, embed_dim = query.size()
         assert self.embed_dim == embed_dim
 
+        
+        # ___QUESTION-8-MULTIHEAD-ATTENTION-START
         '''
         ___QUESTION-8-MULTIHEAD-ATTENTION-START
         Implement Multi-Head attention  according to Section 3.2.2 of https://arxiv.org/pdf/1706.03762.pdf.
@@ -216,6 +226,8 @@ class MultiHeadAttention(nn.Module):
         '''
         ___QUESTION-8-MULTIHEAD-ATTENTION-END
         '''
+                
+
 
         return attn, attn_weights
 

@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import sys
 import preprocess
-
+import pprint
 from collections import defaultdict
 from torch.serialization import default_restore_location
 
@@ -17,7 +17,8 @@ def load_embedding(embed_path, dictionary):
         embed_dim = int(next(file).rstrip().split(" ")[1])
         for line in file:
             tokens = line.rstrip().split(" ")
-            embed_dict[tokens[0]] = torch.Tensor([float(weight) for weight in tokens[1:]])
+            embed_dict[tokens[0]] = torch.Tensor(
+                [float(weight) for weight in tokens[1:]])
 
     logging.info('Loaded {} / {} word embeddings'.format(
         len(set(embed_dict.keys()) & set(dictionary.words)), len(embed_dict)))
@@ -57,17 +58,21 @@ def save_checkpoint(args, model, optimizer, epoch, valid_loss):
     }
 
     if args.epoch_checkpoints and epoch % args.save_interval == 0:
-        torch.save(state_dict, os.path.join(args.save_dir, 'checkpoint{}_{:.3f}.pt'.format(epoch, valid_loss)))
+        torch.save(state_dict, os.path.join(args.save_dir,
+                                            'checkpoint{}_{:.3f}.pt'.format(epoch, valid_loss)))
     if valid_loss < prev_best:
-        torch.save(state_dict, os.path.join(args.save_dir, 'checkpoint_best.pt'))
+        torch.save(state_dict, os.path.join(
+            args.save_dir, 'checkpoint_best.pt'))
     if last_epoch < epoch:
-        torch.save(state_dict, os.path.join(args.save_dir, 'checkpoint_last.pt'))
+        torch.save(state_dict, os.path.join(
+            args.save_dir, 'checkpoint_last.pt'))
 
 
 def load_checkpoint(args, model, optimizer):
     checkpoint_path = os.path.join(args.save_dir, args.restore_file)
     if os.path.isfile(checkpoint_path):
-        state_dict = torch.load(checkpoint_path, map_location=lambda s, l: default_restore_location(s, 'cpu'))
+        state_dict = torch.load(
+            checkpoint_path, map_location=lambda s, l: default_restore_location(s, 'cpu'))
         model.load_state_dict(state_dict['model'])
         optimizer.load_state_dict(state_dict['optimizer'])
         save_checkpoint.best_loss = state_dict['best_loss']
@@ -84,7 +89,7 @@ def init_logging(args):
     logging.basicConfig(handlers=handlers, format='[%(asctime)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S',
                         level=logging.INFO)
     logging.info('COMMAND: %s' % ' '.join(sys.argv))
-    logging.info('Arguments: {}'.format(vars(args)))
+    logging.info('Arguments: {}'.format(pprint.pformat(vars(args))))
 
 
 INCREMENTAL_STATE_INSTANCE_ID = defaultdict(lambda: 0)
@@ -119,7 +124,8 @@ def post_process_prediction(hypo_tokens, src_str, alignment, tgt_dict, remove_bp
     # hypo_str = replace_unk(hypo_str, src_str, alignment, tgt_dict.unk_word)
     # Convert back to tokens for evaluating with unk replacement or without BPE
     # Note that the dictionary can be modified inside the method.
-    hypo_tokens = tgt_dict.binarize(hypo_str, preprocess.word_tokenize, add_if_not_exist=True)
+    hypo_tokens = tgt_dict.binarize(
+        hypo_str, preprocess.word_tokenize, add_if_not_exist=True)
     return hypo_tokens, hypo_str, alignment
 
 

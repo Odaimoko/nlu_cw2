@@ -58,8 +58,6 @@ def get_args():
     parser.add_argument('--epoch-checkpoints',
                         action='store_true', help='store all epoch checkpoints')
 
-    parser.add_argument('--play', default=False,
-                        help='If true, use smaller dataset to run faster')
     # Parse twice as model arguments are not known the first time
     args, _ = parser.parse_known_args()
     model_parser = parser.add_argument_group(
@@ -79,7 +77,7 @@ def main(args):
 
     utils.init_logging(args)
 
-    # Load dictionaries
+    # Load dictionaries [for each language]
     src_dict = Dictionary.load(os.path.join(
         args.data, 'dict.{:s}'.format(args.source_lang)))
     logging.info('Loaded a source dictionary ({:s}) with {:d} words'.format(
@@ -142,8 +140,6 @@ def main(args):
 
         # Iterate over the training set
         for i, sample in enumerate(progress_bar):
-            if args.play and i > 10:
-                break
             if torch.cuda.is_available() and args.cuda:
                 for k in sample:
                     if type(sample[k]) == torch.Tensor:
@@ -152,6 +148,8 @@ def main(args):
                 continue
             model.train()
 
+            
+            # ___QUESTION-1-DESCRIBE-F-START___
             '''
             ___QUESTION-1-DESCRIBE-F-START___
             Describe what the following lines of code do.
@@ -176,6 +174,7 @@ def main(args):
             optimizer.step()
             optimizer.zero_grad()
             '''___QUESTION-1-DESCRIBE-F-END___'''
+            
 
             # Update statistics for progress bar
             total_loss, num_tokens, batch_size = loss.item(

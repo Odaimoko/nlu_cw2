@@ -93,6 +93,8 @@ class TransformerEncoder(Seq2SeqEncoder):
         # Clone for output state
         src_embeddings = embeddings.clone()
 
+        
+        # ___QUESTION-7-DESCRIBE-A-START___
         '''
         ___QUESTION-7-DESCRIBE-A-START___
         What is the purpose of the positional embeddings in the encoder and decoder? Why can't we use only
@@ -102,6 +104,8 @@ class TransformerEncoder(Seq2SeqEncoder):
         '''
         ___QUESTION-7-DESCRIBE-A-END___
         '''
+                
+
         forward_state = F.dropout(embeddings, p=self.dropout, training=self.training)
 
         # Transpose batch: [batch_size, src_time_steps, num_features] -> [src_time_steps, batch_size, num_features]
@@ -183,6 +187,8 @@ class TransformerDecoder(Seq2SeqDecoder):
         for layer_idx, layer in enumerate(self.layers):
             is_attention_layer = layer_idx == len(self.layers) - 1
             encoder_state = encoder_out['src_out'] if encoder_out is not None else None
+            
+            # ___QUESTION-7-DESCRIBE-B-START___
             '''
             ___QUESTION-7-DESCRIBE-B-START___
             What is the purpose of self_attn_mask? Why do we need it in the decoder but not in the encoder?
@@ -192,6 +198,8 @@ class TransformerDecoder(Seq2SeqDecoder):
             '''
             ___QUESTION-7-DESCRIBE-B-END___
             '''
+                        
+
 
             forward_state, layer_attn = layer(state=forward_state,
                                               encoder_out=encoder_state,
@@ -211,6 +219,8 @@ class TransformerDecoder(Seq2SeqDecoder):
 
         # Project into output layer
         if not features_only:
+            
+            # ___QUESTION-7-DESCRIBE-C-START___
             '''
             ___QUESTION-7-DESCRIBE-C-START___
             Why do we need a linear projection after the decoder layers? What is the dimensionality of forward_state
@@ -220,6 +230,8 @@ class TransformerDecoder(Seq2SeqDecoder):
             '''
             ___QUESTION-7-DESCRIBE-C-END___
             '''
+                        
+
         return forward_state, {
             "attn_state": attn_state,
             "inner_states": inner_states
