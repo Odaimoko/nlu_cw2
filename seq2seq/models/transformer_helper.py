@@ -299,7 +299,7 @@ class PositionalEmbedding(nn.Module):
 
         # Replace non-padding symbols with position numbers from padding_idx+1 onwards.
 
-        mask = inputs.ne(self.padding_idx).int()
+        mask = inputs.ne(self.padding_idx).long()
         if torch.cuda.is_available():
             mask = mask.cuda()
         positions = (torch.cumsum(mask, dim=1).type_as(inputs) * mask).long() + self.padding_idx
