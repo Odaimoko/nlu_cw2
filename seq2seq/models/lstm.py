@@ -242,7 +242,8 @@ class AttentionLayer(nn.Module):
         
         attn_weights = F.softmax(attn_scores, dim = -1)
         attn_context = torch.bmm(attn_weights, encoder_out).squeeze(dim = 1)
-        # Oda: tgt_input is actually tgt_hidden_states
+        # Oda: tgt_input is actually tgt_hidden_states,
+        #  so here concat hidden and context as stated in textbook
         context_plus_hidden = torch.cat([tgt_input, attn_context], dim = 1)
         attn_out = torch.tanh(
             self.context_plus_hidden_projection(context_plus_hidden))
@@ -447,13 +448,14 @@ class LSTMDecoder(Seq2SeqDecoder):
             self, incremental_state, 'cached_state', (tgt_hidden_states, tgt_cell_states, input_feed))
         
         # Collect outputs across time steps
-        decoder_output = torch.cat(rnn_outputs, dim = 0).view(
-            tgt_time_steps, batch_size, self.hidden_size)
+        decoder_output = torch.cat(rnn_outputs, dim = 0).view(tgt_time_steps, batch_size, self.hidden_size)
         
         # Transpose batch back: [tgt_time_steps, batch_size, num_features] -> [batch_size, tgt_time_steps, num_features]
         decoder_output = decoder_output.transpose(0, 1)
         
         # Final projection
+        # Oda: From RNN output (feature space) to vocab. Softmax is applied later.
+        #  one reason is that torch's CrossEntropyLoss accepts raw data, but not prob after softmax
         decoder_output = self.final_projection(decoder_output)
         
         if self.use_lexical_model:
