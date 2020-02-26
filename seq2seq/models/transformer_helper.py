@@ -221,6 +221,10 @@ class MultiHeadAttention(nn.Module):
         # TODO: REPLACE THESE LINES WITH YOUR IMPLEMENTATION ------------------------ CUT
         attn = torch.zeros(size=(tgt_time_steps, batch_size, embed_dim))
         attn_weights = torch.zeros(size=(self.num_heads, batch_size, tgt_time_steps,key.size(0))) if need_weights else None
+        if torch.cuda.is_available():
+            attn = attn.cuda()
+            if need_weights:
+                attn_weights = attn_weights.cuda()
         if attn_mask is not None:
             attn_mask = attn_mask.repeat(batch_size,1,1)
         if key_padding_mask is not None:
