@@ -223,10 +223,14 @@ class MultiHeadAttention(nn.Module):
         attn_weights = torch.zeros(size=(self.num_heads, batch_size, tgt_time_steps,key.size(0))) if need_weights else None
         if attn_mask is not None:
             attn_mask = attn_mask.repeat(batch_size,1,1)
+        if key_padding_mask is not None:
+            key_padding_mask = key_padding_mask.transpose(1, 0).repeat(key.size(2), 1, 1)
         for head in range(self.num_heads):
             if key_padding_mask is not None:
                 key = key.permute(2,0,1)
-                key = key.mul(key_padding_mask.transpose(1,0))
+
+                key.masked_fill(key_padding_mask.bool(),float(0))
+
                 key = key.permute(1,2,0)
 
             Q_p = self.q_proj(query)
@@ -238,6 +242,7 @@ class MultiHeadAttention(nn.Module):
             if need_weights:
                 attn_weights[head] = F.softmax(torch.exp(QK))
             attn_h = F.softmax(torch.exp(QK)).bmm(V_p.permute(1, 0, 2))
+            # attn_h = torch.exp(QK)).bmm(V_p.permute(1, 0, 2))
             attn += attn_h.permute(1,0,2)/self.num_heads
 
 
