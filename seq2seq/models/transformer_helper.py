@@ -220,13 +220,46 @@ class MultiHeadAttention(nn.Module):
         # attn_weights must be size [num_heads, batch_size, tgt_time_steps, key.size(0)]
         # TODO: REPLACE THESE LINES WITH YOUR IMPLEMENTATION ------------------------ CUT
         attn = torch.zeros(size=(tgt_time_steps, batch_size, embed_dim))
-        attn_weights = torch.zeros(size=(self.num_heads, batch_size, tgt_time_steps, -1)) if need_weights else None
+        attn_weights = torch.zeros(size=(self.num_heads, batch_size, tgt_time_steps,key.size(0))) if need_weights else None
+        if torch.cuda.is_available():
+            attn = attn.cuda()
+            if need_weights:
+                attn_weights = attn_weights.cuda()
+        if attn_mask is not None:
+            attn_mask = attn_mask.repeat(batch_size,1,1)
+        if key_padding_mask is not None:
+            key_padding_mask = key_padding_mask.transpose(1, 0).repeat(key.size(2), 1, 1)
+        for head in range(self.num_heads):
+            if key_padding_mask is not None:
+                key = key.permute(2,0,1)
+
+                key.masked_fill(key_padding_mask.bool(),float(0))
+
+                key = key.permute(1,2,0)
+
+            Q_p = self.q_proj(query)
+            K_p = self.k_proj(key)
+            V_p = self.v_proj(value)
+            QK = Q_p.permute(1,0,2).bmm(K_p.permute(1,2,0))/self.head_scaling
+            if attn_mask is not None:
+                QK = QK+attn_mask
+            if need_weights:
+                attn_weights[head] = F.softmax(torch.exp(QK))
+            attn_h = F.softmax(torch.exp(QK)).bmm(V_p.permute(1, 0, 2))
+            # attn_h = torch.exp(QK)).bmm(V_p.permute(1, 0, 2))
+            attn += attn_h.permute(1,0,2)/self.num_heads
+
+
+
+            # print(attn_h.shape)
+        attn = self.out_proj(attn)
         # TODO: --------------------------------------------------------------------- CUT
 
         '''
         ___QUESTION-8-MULTIHEAD-ATTENTION-END
         '''
-                
+
+
 
 
         return attn, attn_weights
@@ -269,9 +302,14 @@ class PositionalEmbedding(nn.Module):
             return self.weights.index_select(index=self.padding_idx + pos, dim=0).unsqueeze(1).repeat(batch_size, 1, 1)
 
         # Replace non-padding symbols with position numbers from padding_idx+1 onwards.
-        mask = inputs.ne(self.padding_idx).int()
-        positions = (torch.cumsum(mask, dim=1).type_as(inputs) * mask).long() + self.padding_idx
 
+        mask = inputs.ne(self.padding_idx).long()
+        if torch.cuda.is_available():
+            mask = mask.cuda()
+        positions = (torch.cumsum(mask, dim=1).type_as(inputs) * mask).long() + self.padding_idx
+        if torch.cuda.is_available():
+            # mask = mask.cuda()
+            positions = positions.cuda()
         # Lookup positional embeddings for each position and return in shape of input tensor w/o gradient
         return self.weights.index_select(0, positions.view(-1)).view(batch_size, seq_len, -1).detach()
 

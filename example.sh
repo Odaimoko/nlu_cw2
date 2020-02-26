@@ -12,11 +12,11 @@ source ~/miniconda3/bin/activate nlu
 
 # Define a location for all your experiments to save
 ROOT=$(git rev-parse --show-toplevel)
-RESULTS_ROOT="${ROOT}/results"
+RESULTS_ROOT="${ROOT}/result"
 mkdir -p ${RESULTS_ROOT}
 
 ### NAME YOUR EXPERIMENT HERE ##
-EXP_NAME="example"
+EXP_NAME="Q1"
 ################################
 
 ## Local variables for current experiment
