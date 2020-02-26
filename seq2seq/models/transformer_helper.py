@@ -298,9 +298,12 @@ class PositionalEmbedding(nn.Module):
             return self.weights.index_select(index=self.padding_idx + pos, dim=0).unsqueeze(1).repeat(batch_size, 1, 1)
 
         # Replace non-padding symbols with position numbers from padding_idx+1 onwards.
+
         mask = inputs.ne(self.padding_idx).int()
         positions = (torch.cumsum(mask, dim=1).type_as(inputs) * mask).long() + self.padding_idx
-
+        if torch.cuda.is_available() and args.cuda:
+            # mask = mask.cuda()
+            positions = positions.cuda
         # Lookup positional embeddings for each position and return in shape of input tensor w/o gradient
         return self.weights.index_select(0, positions.view(-1)).view(batch_size, seq_len, -1).detach()
 
