@@ -220,13 +220,37 @@ class MultiHeadAttention(nn.Module):
         # attn_weights must be size [num_heads, batch_size, tgt_time_steps, key.size(0)]
         # TODO: REPLACE THESE LINES WITH YOUR IMPLEMENTATION ------------------------ CUT
         attn = torch.zeros(size=(tgt_time_steps, batch_size, embed_dim))
-        attn_weights = torch.zeros(size=(self.num_heads, batch_size, tgt_time_steps, -1)) if need_weights else None
+        attn_weights = torch.zeros(size=(self.num_heads, batch_size, tgt_time_steps,key.size(0))) if need_weights else None
+        if attn_mask is not None:
+            attn_mask = attn_mask.repeat(batch_size,1,1)
+        for head in range(self.num_heads):
+            if key_padding_mask is not None:
+                key = key.permute(2,0,1)
+                key = key.mul(key_padding_mask.transpose(1,0))
+                key = key.permute(1,2,0)
+
+            Q_p = self.q_proj(query)
+            K_p = self.k_proj(key)
+            V_p = self.v_proj(value)
+            QK = Q_p.permute(1,0,2).bmm(K_p.permute(1,2,0))/self.head_scaling
+            if attn_mask is not None:
+                QK = QK+attn_mask
+            if need_weights:
+                attn_weights[head] = F.softmax(torch.exp(QK))
+            attn_h = F.softmax(torch.exp(QK)).bmm(V_p.permute(1, 0, 2))
+            attn += attn_h.permute(1,0,2)/self.num_heads
+
+
+
+            # print(attn_h.shape)
+        attn = self.out_proj(attn)
         # TODO: --------------------------------------------------------------------- CUT
 
         '''
         ___QUESTION-8-MULTIHEAD-ATTENTION-END
         '''
-                
+
+
 
 
         return attn, attn_weights
