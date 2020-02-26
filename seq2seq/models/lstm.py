@@ -242,6 +242,7 @@ class AttentionLayer(nn.Module):
         
         attn_weights = F.softmax(attn_scores, dim = -1)
         attn_context = torch.bmm(attn_weights, encoder_out).squeeze(dim = 1)
+        # Oda: tgt_input is actually tgt_hidden_states
         context_plus_hidden = torch.cat([tgt_input, attn_context], dim = 1)
         attn_out = torch.tanh(
             self.context_plus_hidden_projection(context_plus_hidden))
@@ -268,10 +269,8 @@ class AttentionLayer(nn.Module):
         for each item in batch: do [1, input_dims]*[output_dims, src_time_steps]
         
         '''
-        projected_encoder_out = self.src_projection(
-            encoder_out).transpose(2, 1)
-        attn_scores = torch.bmm(
-            tgt_input.unsqueeze(dim = 1), projected_encoder_out)
+        projected_encoder_out = self.src_projection(encoder_out).transpose(2, 1)
+        attn_scores = torch.bmm(tgt_input.unsqueeze(dim = 1), projected_encoder_out)
         '''___QUESTION-1-DESCRIBE-C-END___'''
         
         return attn_scores
@@ -357,11 +356,13 @@ class LSTMDecoder(Seq2SeqDecoder):
         When cached_state == None, all hidden_units and cell_units will set to zero.
         input_feed the previous prediction, so model can depend on all input and previous predictions to predict.
         '''
-        cached_state = utils.get_incremental_state(
-            self, incremental_state, 'cached_state')
+        # Oda: incremental_state will always be None, thus cached_state will be None in get_incremental_state
+        cached_state = utils.get_incremental_state(self, incremental_state, 'cached_state')
         if cached_state is not None:
             tgt_hidden_states, tgt_cell_states, input_feed = cached_state
         else:
+            # Oda: Save all hidden and memory output for each RNN block. Only one for default
+            #  This is not time step, it is stacked RNN.
             tgt_hidden_states = [torch.zeros(
                 tgt_inputs.size()[0], self.hidden_size) for i in range(len(self.layers))]
             tgt_cell_states = [torch.zeros(
@@ -383,12 +384,11 @@ class LSTMDecoder(Seq2SeqDecoder):
         # Cache lexical context vectors per translation time-step
         lexical_contexts = []
         
-        for j in range(tgt_time_steps):
+        for j in range(tgt_time_steps):  # oda: j = time step
             # Concatenate the current token embedding with output from previous time step (i.e. 'input feeding')
-            lstm_input = torch.cat(
-                [tgt_embeddings[j, :, :], input_feed], dim = 1)
+            lstm_input = torch.cat([tgt_embeddings[j, :, :], input_feed], dim = 1)
             
-            for layer_id, rnn_layer in enumerate(self.layers):
+            for layer_id, rnn_layer in enumerate(self.layers):  # Oda: go through stacked RNN
                 # Pass target input through the recurrent layer(s)
                 tgt_hidden_states[layer_id], tgt_cell_states[layer_id] = \
                     rnn_layer(
@@ -414,8 +414,8 @@ class LSTMDecoder(Seq2SeqDecoder):
             if self.attention is None:
                 input_feed = tgt_hidden_states[-1]
             else:
-                input_feed, step_attn_weights = self.attention(
-                    tgt_hidden_states[-1], src_out, src_mask)
+                # Oda: tgt_hidden_states is hidden for one time step
+                input_feed, step_attn_weights = self.attention(tgt_hidden_states[-1], src_out, src_mask)
                 attn_weights[:, j, :] = step_attn_weights
                 
                 if self.use_lexical_model:
