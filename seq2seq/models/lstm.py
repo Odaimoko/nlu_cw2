@@ -29,7 +29,7 @@ class LSTMModel(Seq2SeqModel):
         parser.add_argument('--encoder-num-layers', type = int,
                             help = 'number of encoder layers')
         parser.add_argument('--encoder-bidirectional',
-                            help = 'bidirectional encoder')  # diff
+                            help = 'bidirectional encoder')  # oda: diff, default set to True in base_architecture
         parser.add_argument('--encoder-dropout-in',
                             help = 'dropout probability for encoder input embedding')
         parser.add_argument('--encoder-dropout-out',
@@ -48,7 +48,7 @@ class LSTMModel(Seq2SeqModel):
         parser.add_argument('--decoder-dropout-out', type = float,
                             help = 'dropout probability for decoder output')
         parser.add_argument('--decoder-use-attention',
-                            help = 'decoder attention')  # diff
+                            help = 'decoder attention')  # diff, default true
         parser.add_argument('--decoder-use-lexical-model',
                             help = 'toggle for the lexical model')  # diff
     
@@ -72,7 +72,8 @@ class LSTMModel(Seq2SeqModel):
                               embed_dim = args.encoder_embed_dim,
                               hidden_size = args.encoder_hidden_size,
                               num_layers = args.encoder_num_layers,
-                              bidirectional = args.encoder_bidirectional,
+                              bidirectional = bool(
+                                  eval(args.encoder_bidirectional)),
                               dropout_in = args.encoder_dropout_in,
                               dropout_out = args.encoder_dropout_out,
                               pretrained_embedding = encoder_pretrained_embedding)
@@ -166,7 +167,6 @@ class LSTMEncoder(Seq2SeqEncoder):
         assert list(lstm_output.size()) == [
             src_time_steps, batch_size, self.output_dim]  # sanity check
         
-        
         # ___QUESTION-1-DESCRIBE-A-START___
         '''
         ___QUESTION-1-DESCRIBE-A-START___
@@ -194,7 +194,6 @@ class LSTMEncoder(Seq2SeqEncoder):
             final_hidden_states = combine_directions(final_hidden_states)
             final_cell_states = combine_directions(final_cell_states)
         '''___QUESTION-1-DESCRIBE-A-END___'''
-        
         
         # Generate mask zeroing-out padded positions in encoder inputs
         src_mask = src_tokens.eq(self.dictionary.pad_idx)
@@ -226,7 +225,6 @@ class AttentionLayer(nn.Module):
         # [batch_size, 1, src_time_steps]
         attn_scores = self.score(tgt_input, encoder_out)
         
-        
         # ___QUESTION-1-DESCRIBE-B-START___
         '''
         ___QUESTION-1-DESCRIBE-B-START___
@@ -249,12 +247,10 @@ class AttentionLayer(nn.Module):
             self.context_plus_hidden_projection(context_plus_hidden))
         '''___QUESTION-1-DESCRIBE-B-END___'''
         
-        
         return attn_out, attn_weights.squeeze(dim = 1)
     
     def score(self, tgt_input, encoder_out):
         """ Computes attention scores. """
-        
         
         # ___QUESTION-1-DESCRIBE-C-START___
         '''
@@ -277,7 +273,6 @@ class AttentionLayer(nn.Module):
         attn_scores = torch.bmm(
             tgt_input.unsqueeze(dim = 1), projected_encoder_out)
         '''___QUESTION-1-DESCRIBE-C-END___'''
-        
         
         return attn_scores
 
@@ -403,7 +398,6 @@ class LSTMDecoder(Seq2SeqDecoder):
                 lstm_input = F.dropout(
                     tgt_hidden_states[layer_id], p = self.dropout_out, training = self.training)
             
-            
             # ___QUESTION-1-DESCRIBE-E-START___
             '''
             ___QUESTION-1-DESCRIBE-E-START___
@@ -447,7 +441,6 @@ class LSTMDecoder(Seq2SeqDecoder):
                 input_feed, p = self.dropout_out, training = self.training)
             rnn_outputs.append(input_feed)
             '''___QUESTION-1-DESCRIBE-E-END___'''
-            
         
         # Cache previous states (only used during incremental, auto-regressive generation)
         utils.set_incremental_state(
