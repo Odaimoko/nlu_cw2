@@ -16,7 +16,7 @@ RESULTS_ROOT="${ROOT}/result"
 mkdir -p ${RESULTS_ROOT}
 
 ### NAME YOUR EXPERIMENT HERE ##
-EXP_NAME="Q1"
+EXP_NAME="Q4"
 ################################
 
 ## Local variables for current experiment
@@ -28,14 +28,19 @@ mkdir -p ${EXP_ROOT}
 
 # Train model. Defaults are used for any argument not specified here. Use "\" to add arguments over multiple lines.
 python train.py --save-dir "${EXP_ROOT}" \
-                --log-file "${EXP_ROOT}/log.out"  \
+                --log-file "${EXP_ROOT}/log.txt"  \
                 --data "${DATA_DIR}" \
-                ### ADDITIONAL ARGUMENTS HERE ###
-
+		--encoder-num-layers 2 \
+	       	--decoder-num-layers 3 \
+		--cuda True \
+#		--decoder-use-lexical-model True \
+	#	--arch transformer \
+                ### ADDITION AL ARGUMENTS HERE ###
+cp "${EXP_ROOT}/log.txt" "${EXP_ROOT}/train_log.out"
 ## Prediction step
 python translate.py \
     --checkpoint-path "${EXP_ROOT}/checkpoint_best.pt" \
-    --output "${TEST_EN_PRED}"
-
+    --output "${TEST_EN_PRED}" \
+    --cuda True
 ## Calculate BLEU score for model outputs
 perl multi-bleu.perl -lc ${TEST_EN_GOLD} < ${TEST_EN_PRED} | tee "${EXP_ROOT}/bleu.txt"
