@@ -1,0 +1,42 @@
+INFO: COMMAND: train.py --save-dir /home/lvyajie/nlu_cw2/result/Q5 --log-file /home/lvyajie/nlu_cw2/result/Q5/log.txt --data /home/lvyajie/nlu_cw2/europarl_prepared --cuda True --decoder-use-lexical-model True
+INFO: Arguments: {'arch': 'lstm',
+ 'batch_size': 10,
+ 'clip_norm': 4.0,
+ 'cuda': 'True',
+ 'data': '/home/lvyajie/nlu_cw2/europarl_prepared',
+ 'decoder_dropout_in': 0.25,
+ 'decoder_dropout_out': 0.25,
+ 'decoder_embed_dim': 64,
+ 'decoder_embed_path': None,
+ 'decoder_hidden_size': 128,
+ 'decoder_num_layers': 1,
+ 'decoder_use_attention': 'True',
+ 'decoder_use_lexical_model': 'True',
+ 'device_id': 0,
+ 'encoder_bidirectional': 'True',
+ 'encoder_dropout_in': 0.25,
+ 'encoder_dropout_out': 0.25,
+ 'encoder_embed_dim': 64,
+ 'encoder_embed_path': None,
+ 'encoder_hidden_size': 64,
+ 'encoder_num_layers': 1,
+ 'epoch_checkpoints': False,
+ 'log_file': '/home/lvyajie/nlu_cw2/result/Q5/log.txt',
+ 'lr': 0.0003,
+ 'max_epoch': 100,
+ 'max_tokens': None,
+ 'no_save': False,
+ 'patience': 10,
+ 'restore_file': 'checkpoint_last.pt',
+ 'save_dir': '/home/lvyajie/nlu_cw2/result/Q5',
+ 'save_interval': 1,
+ 'source_lang': 'de',
+ 'target_lang': 'en',
+ 'train_on_tiny': False}
+INFO: Loaded a source dictionary (de) with 5047 words
+INFO: Loaded a target dictionary (en) with 4420 words
+INFO: Built a model with 1748104 parameters
+INFO: Epoch 000: loss 5.558 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 14.65 | clip 1
+INFO: Epoch 000: valid_loss 5.04 | num_tokens 13.8 | batch_size 500 | valid_perplexity 154
+INFO: Epoch 001: loss 4.93 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 14.92 | clip 1
+INFO: Epoch 001: valid_loss 4.63 | num_tokens 13.8 | batch_size 500 | valid_perplexity 103
