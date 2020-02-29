@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ROOT=$(git rev-parse --show-toplevel)
 ## Local variables for current experiment
 # EXP_ROOT="checkpoints/Q1-10.77"
