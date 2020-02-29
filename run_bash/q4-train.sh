@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Define a location for all your experiments to save
 . /opt/anaconda3/etc/profile.d/conda.sh 
-conda activate nlu
 ROOT="."
 RESULTS_ROOT="${ROOT}/oda_exp"
 
@@ -21,8 +20,9 @@ mkdir -p ${RESULTS_ROOT}
 python train.py --save-dir "${EXP_ROOT}" \
                 --log-file "${EXP_ROOT}/log.txt"  \
                 --data "${DATA_DIR}" \
-                --max-epoch 5 \
-                --train-on-tiny --encoder-num-layers 2 --decoder-num-layers 3
+                --max-epoch 150 \
+                --encoder-num-layers 2 --decoder-num-layers 3 --cuda True \
+#                --train-on-tiny
 
                 ### ADDITIONAL ARGUMENTS HERE ###
 
