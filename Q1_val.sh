@@ -1,7 +1,7 @@
 ROOT=$(git rev-parse --show-toplevel)
 ## Local variables for current experiment
-EXP_ROOT="checkpoints/Q1-10.77"
-EXP_ROOT="result/Q1"
+# EXP_ROOT="checkpoints/Q1-10.77"
+EXP_ROOT="result/Q1-10.77"
 DATA_DIR="${ROOT}/europarl_prepared"
 TEST_EN_GOLD="${ROOT}/europarl_raw/test.en"
 TEST_EN_PRED="${EXP_ROOT}/model_translations.txt"
