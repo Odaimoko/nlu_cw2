@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Define a location for all your experiments to save
 . /opt/anaconda3/etc/profile.d/conda.sh 
+conda activate nlu
 ROOT="."
 RESULTS_ROOT="${ROOT}/oda_exp"
 
@@ -18,7 +19,7 @@ mkdir -p ${RESULTS_ROOT}
 
 # Train model. Defaults are used for any argument not specified here. Use "\" to add arguments over multiple lines.
 python train.py --save-dir "${EXP_ROOT}" \
-                --log-file "${EXP_ROOT}/log.txt"  \
+                --log-file "${EXP_ROOT}/train_log.txt"  \
                 --data "${DATA_DIR}" \
                 --max-epoch 150 \
                  --cuda True \
@@ -32,7 +33,7 @@ python train.py --save-dir "${EXP_ROOT}" \
 ## Prediction step
 python translate.py \
     --checkpoint-path "${EXP_ROOT}/checkpoint_best.pt" \
-    --output "${TEST_EN_PRED}" --cuda True
+    --output "${TEST_EN_PRED}" --cuda True --log-file "${EXP_ROOT}/trans_log.txt"
 
 ## Calculate BLEU score for model outputs
 perl multi-bleu.perl -lc ${TEST_EN_GOLD} < ${TEST_EN_PRED} | tee "${EXP_ROOT}/bleu.txt"
