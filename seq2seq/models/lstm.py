@@ -319,7 +319,7 @@ class LSTMDecoder(Seq2SeqDecoder):
         if self.use_lexical_model:
             # __QUESTION-5: Add parts of decoder architecture corresponding to the LEXICAL MODEL here
             # TODO: --------------------------------------------------------------------- CUT
-            self.Lexical_FFNN = nn.Linear(embed_dim, embed_dim)
+            self.Lexical_FFNN = nn.Linear(embed_dim, embed_dim, bias = False)
             self.Lexical_add = nn.Linear(embed_dim, len(dictionary))
             # TODO: --------------------------------------------------------------------- /CUT
     
@@ -416,27 +416,33 @@ class LSTMDecoder(Seq2SeqDecoder):
                 input_feed = tgt_hidden_states[-1]
             else:
                 # Oda: tgt_hidden_states is hidden for one time step
+                #  step_attn_weights: bs x len_input
+                #  attn_weights: bs x len_out x len_in
                 input_feed, step_attn_weights = self.attention(tgt_hidden_states[-1], src_out, src_mask)
                 attn_weights[:, j, :] = step_attn_weights
                 
                 if self.use_lexical_model:
                     # __QUESTION-5: Compute and collect LEXICAL MODEL context vectors here
                     # TODO: --------------------------------------------------------------------- CUT
-                    weight_sum = torch.zeros(
-                        (src_embeddings.shape[1], src_embeddings.shape[2]))
-                    if torch.cuda.is_available():
-                        weight_sum = weight_sum.cuda()
-                    for i in range(src_embeddings.shape[0]):
-                        # print(step_attn_weights[:,i].shape)
-                        # print(src_embeddings[i].shape)
-                        
-                        weight_sum += step_attn_weights[:, i].repeat(
-                            src_embeddings.shape[2], 1).transpose(1, 0) * src_embeddings[i]
-                    flt = torch.tanh(weight_sum)
-                    
-                    htl = torch.tanh(self.Lexical_FFNN(flt)) + flt
-                    lexical_contexts.append(htl)
+                    # weight_sum = torch.zeros(
+                    #     (src_embeddings.shape[1], src_embeddings.shape[2]))
+                    # if torch.cuda.is_available():
+                    #     weight_sum = weight_sum.cuda()
+                    # for i in range(src_embeddings.shape[0]):
+                    #     # print(step_attn_weights[:,i].shape)
+                    #     # print(src_embeddings[i].shape)
+                    #
+                    #     weight_sum += step_attn_weights[:, i].repeat(
+                    #         src_embeddings.shape[2], 1).transpose(1, 0) * src_embeddings[i]
+                    # weight_sum = torch.bmm(src_embeddings.transpose(0, 1).transpose(1, 2),
+                    #                        step_attn_weights.unsqueeze(2)).squeeze()
+                    # # ws.append(weight_sum) # debug
+                    # flt = torch.tanh(weight_sum)
+                    #
+                    # htl = torch.tanh(self.Lexical_FFNN(flt)) + flt
+                    # lexical_contexts.append(htl)
                     # TODO: --------------------------------------------------------------------- /CUT
+                    pass
             
             input_feed = F.dropout(
                 input_feed, p = self.dropout_out, training = self.training)
@@ -461,7 +467,13 @@ class LSTMDecoder(Seq2SeqDecoder):
         if self.use_lexical_model:
             # __QUESTION-5: Incorporate the LEXICAL MODEL into the prediction of target tokens here
             # TODO: --------------------------------------------------------------------- CUT
-            lexical_contexts = torch.stack(lexical_contexts).transpose(1, 0)
+            weighted_sum = torch.bmm(attn_weights, src_embeddings.transpose(0, 1))
+            bs, out, es = weighted_sum.shape
+            weighted_sum = weighted_sum.view(-1, es)
+            flt = torch.tanh(weighted_sum)
+            htl = torch.tanh(self.Lexical_FFNN(flt)) + flt
+            lexical_contexts = htl.view(bs, out, es)
+            # lexical_contexts = torch.stack(lexical_contexts).transpose(1, 0)
             # print(decoder_output.shape)
             # print(lexical_contexts.shape)
             decoder_output += self.Lexical_add(lexical_contexts)
