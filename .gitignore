@@ -138,3 +138,5 @@ example.sh
 checkpoints/*
 play.sh
 oda_exp/
+vis/
+checkpoint_best.pt
