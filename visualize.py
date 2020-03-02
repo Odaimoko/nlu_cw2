@@ -34,7 +34,11 @@ def main(args):
     torch.manual_seed(42)
     state_dict = torch.load(
         args.checkpoint_path, map_location=lambda s, l: default_restore_location(s, 'cpu'))
-    args = argparse.Namespace(**{**vars(args), **vars(state_dict['args'])})
+    saved_args = vars(state_dict['args'])
+    for k in saved_args:
+        if type(saved_args[k]) == str and '/home/lvyajie/nlu_cw2/' in saved_args[k]:
+            saved_args[k] = saved_args[k].replace('/home/lvyajie/nlu_cw2/', '')
+    args = argparse.Namespace(**{**vars(args), **saved_args})
     utils.init_logging(args)
 
     # Load dictionaries
@@ -59,6 +63,9 @@ def main(args):
 
     # Build model and optimization criterion
     model = models.build_model(args, src_dict, tgt_dict)
+
+    if args.cuda and torch.cuda.is_available():
+        model = model.cuda()
     model.load_state_dict(state_dict['model'])
     print('Loaded a model from checkpoint {:s}'.format(args.checkpoint_path))
 
@@ -67,6 +74,10 @@ def main(args):
 
     # Iterate over the visualization set
     for i, sample in enumerate(vis_loader):
+        if torch.cuda.is_available() and args.cuda:
+            for k in sample:
+                if type(sample[k]) == torch.Tensor:
+                    sample[k] = sample[k].cuda()
 
         if len(sample) == 0:
             continue
@@ -94,7 +105,10 @@ def main(args):
         tgt_str = tgt_dict.string(tgt_ids).split(' ') + ['<EOS>']
 
         # Generate heat-maps
-        attn_map = attn_map.squeeze(dim=0).transpose(1, 0).detach().numpy()
+        if torch.cuda.is_available() and args.cuda:
+            attn_map = attn_map.squeeze(dim=0).transpose(1, 0).detach().cpu().numpy()
+        else:
+            attn_map = attn_map.squeeze(dim=0).transpose(1, 0).detach().numpy()
 
         attn_df = pd.DataFrame(attn_map,
                                index=src_str,
