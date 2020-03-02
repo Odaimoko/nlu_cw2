@@ -1,0 +1,180 @@
+Commencing training!
+COMMAND: train.py --save-dir ./oda_exp/q5 --log-file ./oda_exp/q5/log.txt --data ./europarl_prepared --max-epoch 150 --cuda True --patience 20 --decoder-use-lexical-model True
+Arguments: {'arch': 'lstm',
+ 'batch_size': 10,
+ 'clip_norm': 4.0,
+ 'cuda': 'True',
+ 'data': './europarl_prepared',
+ 'decoder_dropout_in': 0.25,
+ 'decoder_dropout_out': 0.25,
+ 'decoder_embed_dim': 64,
+ 'decoder_embed_path': None,
+ 'decoder_hidden_size': 128,
+ 'decoder_num_layers': 1,
+ 'decoder_use_attention': 'True',
+ 'decoder_use_lexical_model': 'True',
+ 'device_id': 0,
+ 'encoder_bidirectional': 'True',
+ 'encoder_dropout_in': 0.25,
+ 'encoder_dropout_out': 0.25,
+ 'encoder_embed_dim': 64,
+ 'encoder_embed_path': None,
+ 'encoder_hidden_size': 64,
+ 'encoder_num_layers': 1,
+ 'epoch_checkpoints': False,
+ 'log_file': './oda_exp/q5/log.txt',
+ 'lr': 0.0003,
+ 'max_epoch': 150,
+ 'max_tokens': None,
+ 'no_save': False,
+ 'patience': 20,
+ 'restore_file': 'checkpoint_last.pt',
+ 'save_dir': './oda_exp/q5',
+ 'save_interval': 1,
+ 'source_lang': 'de',
+ 'target_lang': 'en',
+ 'train_on_tiny': False}
+Loaded a source dictionary (de) with 5047 words
+Loaded a target dictionary (en) with 4420 words
+Built a model with 1748040 parameters
+Loaded checkpoint ./oda_exp/q5/checkpoint_last.pt
+Epoch 021: loss 2.703 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 26.47 | clip 1 
+Epoch 021: valid_loss 3.31 | num_tokens 13.8 | batch_size 500 | valid_perplexity 27.3
+Epoch 022: loss 2.653 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 26.71 | clip 0.999
+Epoch 022: valid_loss 3.3 | num_tokens 13.8 | batch_size 500 | valid_perplexity 27
+Epoch 023: loss 2.605 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 27.02 | clip 0.999
+Epoch 023: valid_loss 3.29 | num_tokens 13.8 | batch_size 500 | valid_perplexity 26.8
+Epoch 024: loss 2.558 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 27.21 | clip 1 
+Epoch 024: valid_loss 3.28 | num_tokens 13.8 | batch_size 500 | valid_perplexity 26.5
+Epoch 025: loss 2.512 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 27.37 | clip 1 
+Epoch 025: valid_loss 3.27 | num_tokens 13.8 | batch_size 500 | valid_perplexity 26.3
+Epoch 026: loss 2.465 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 27.6 | clip 0.999                    
+Epoch 026: valid_loss 3.26 | num_tokens 13.8 | batch_size 500 | valid_perplexity 26.1
+Epoch 027: loss 2.427 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 27.92 | clip 1                       
+Epoch 027: valid_loss 3.25 | num_tokens 13.8 | batch_size 500 | valid_perplexity 25.9
+Epoch 028: loss 2.389 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 28.14 | clip 0.999                   
+Epoch 028: valid_loss 3.26 | num_tokens 13.8 | batch_size 500 | valid_perplexity 26
+Epoch 029: loss 2.386 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 28.41 | clip 1                       
+Epoch 029: valid_loss 3.25 | num_tokens 13.8 | batch_size 500 | valid_perplexity 25.7
+Epoch 030: loss 2.353 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 28.63 | clip 0.999                   
+Epoch 030: valid_loss 3.24 | num_tokens 13.8 | batch_size 500 | valid_perplexity 25.4
+Epoch 031: loss 2.319 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 28.74 | clip 1                       
+Epoch 031: valid_loss 3.23 | num_tokens 13.8 | batch_size 500 | valid_perplexity 25.2
+Epoch 032: loss 2.286 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 28.86 | clip 0.999                   
+Epoch 032: valid_loss 3.23 | num_tokens 13.8 | batch_size 500 | valid_perplexity 25.2
+Epoch 033: loss 2.257 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 28.8 | clip 0.999                    
+Epoch 033: valid_loss 3.22 | num_tokens 13.8 | batch_size 500 | valid_perplexity 25.1
+Epoch 034: loss 2.288 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.38 | clip 0.999                   
+Epoch 034: valid_loss 3.21 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.9
+Epoch 035: loss 2.264 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.29 | clip 0.999                   
+Epoch 035: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.7
+Epoch 036: loss 2.236 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.29 | clip 0.999                   
+Epoch 036: valid_loss 3.21 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.7
+Epoch 037: loss 2.208 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.32 | clip 1                       
+Epoch 037: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.6
+Epoch 038: loss 2.182 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.36 | clip 1                       
+Epoch 038: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 039: loss 2.159 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.37 | clip 0.999                   
+Epoch 039: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.3
+Epoch 040: loss 2.13 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.35 | clip 1                        
+Epoch 040: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 041: loss 2.109 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.41 | clip 0.999                   
+Epoch 041: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 042: loss 2.091 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.53 | clip 1                       
+Epoch 042: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 043: loss 2.069 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.47 | clip 0.999                   
+Epoch 043: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.3
+Epoch 044: loss 2.046 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.51 | clip 0.999                   
+Epoch 044: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.5
+Epoch 045: loss 2.029 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.68 | clip 0.999                   
+Epoch 045: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.2
+Epoch 046: loss 2.011 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.67 | clip 1                       
+Epoch 046: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 047: loss 1.99 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.57 | clip 0.999                    
+Epoch 047: valid_loss 3.18 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.1
+Epoch 048: loss 1.975 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.69 | clip 0.999                   
+Epoch 048: valid_loss 3.18 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.1
+Epoch 049: loss 1.955 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.8 | clip 0.999                    
+Epoch 049: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.2
+Epoch 050: loss 1.936 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.66 | clip 0.999                   
+Epoch 050: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.3
+Epoch 051: loss 1.919 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.81 | clip 1                       
+Epoch 051: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.2
+Epoch 052: loss 1.903 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.86 | clip 0.999                   
+Epoch 052: valid_loss 3.18 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.1
+Epoch 053: loss 1.888 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.85 | clip 1                       
+Epoch 053: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.3
+Epoch 054: loss 1.874 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.91 | clip 1                       
+Epoch 054: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.2
+Epoch 055: loss 1.861 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.93 | clip 1                       
+Epoch 055: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.3
+Epoch 056: loss 1.84 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.87 | clip 0.998                    
+Epoch 056: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.2
+Epoch 057: loss 1.823 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.88 | clip 0.999                   
+Epoch 057: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.5
+Epoch 058: loss 1.817 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.08 | clip 0.999                   
+Epoch 058: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.2
+Epoch 059: loss 1.8 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.04 | clip 0.999                     
+Epoch 059: valid_loss 3.18 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.1
+Epoch 060: loss 1.787 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.95 | clip 0.999                   
+Epoch 060: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.3
+Epoch 061: loss 1.776 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.09 | clip 1                       
+Epoch 061: valid_loss 3.19 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 062: loss 1.76 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.02 | clip 0.999                    
+Epoch 062: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 063: loss 1.751 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.14 | clip 0.999                   
+Epoch 063: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.4
+Epoch 064: loss 1.736 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.13 | clip 0.998                   
+Epoch 064: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.6
+Epoch 065: loss 1.725 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.12 | clip 0.999                   
+Epoch 065: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.6
+Epoch 066: loss 1.711 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.1 | clip 0.999                    
+Epoch 066: valid_loss 3.2 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.5
+Epoch 067: loss 1.703 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 30.11 | clip 0.998                   
+Epoch 067: valid_loss 3.21 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.9
+Epoch 068: loss 1.688 | lr 0.0003 | num_tokens 13.4 | batch_size 10 | grad_norm 29.95 | clip 0.999                   
+Epoch 068: valid_loss 3.21 | num_tokens 13.8 | batch_size 500 | valid_perplexity 24.8
+No validation set improvements observed for 20 epochs. Early stop!
+[2020-03-02 03:14:07] COMMAND: translate.py --checkpoint-path ./oda_exp/q5/checkpoint_best.pt --output ./oda_exp/q5/model_translations.txt --cuda True
+[2020-03-02 03:14:07] Arguments: {'arch': 'lstm',
+ 'batch_size': 10,
+ 'checkpoint_path': './oda_exp/q5/checkpoint_best.pt',
+ 'clip_norm': 4.0,
+ 'cuda': 'True',
+ 'data': './europarl_prepared',
+ 'decoder_dropout_in': 0.25,
+ 'decoder_dropout_out': 0.25,
+ 'decoder_embed_dim': 64,
+ 'decoder_embed_path': None,
+ 'decoder_hidden_size': 128,
+ 'decoder_num_layers': 1,
+ 'decoder_use_attention': 'True',
+ 'decoder_use_lexical_model': 'True',
+ 'device_id': 0,
+ 'encoder_bidirectional': 'True',
+ 'encoder_dropout_in': 0.25,
+ 'encoder_dropout_out': 0.25,
+ 'encoder_embed_dim': 64,
+ 'encoder_embed_path': None,
+ 'encoder_hidden_size': 64,
+ 'encoder_num_layers': 1,
+ 'epoch_checkpoints': False,
+ 'log_file': './oda_exp/q5/log.txt',
+ 'lr': 0.0003,
+ 'max_epoch': 150,
+ 'max_len': 25,
+ 'max_tokens': None,
+ 'no_save': False,
+ 'output': './oda_exp/q5/model_translations.txt',
+ 'patience': 20,
+ 'restore_file': 'checkpoint_last.pt',
+ 'save_dir': './oda_exp/q5',
+ 'save_interval': 1,
+ 'seed': 42,
+ 'source_lang': 'de',
+ 'target_lang': 'en',
+ 'train_on_tiny': False}
+[2020-03-02 03:14:07] Loaded a source dictionary (de) with 5047 words
+[2020-03-02 03:14:07] Loaded a target dictionary (en) with 4420 words
+[2020-03-02 03:14:07] Loaded a model from checkpoint ./oda_exp/q5/checkpoint_best.pt
+[2020-03-02 03:14:18] Output 500 translations to ./oda_exp/q5/model_translations.txt 
