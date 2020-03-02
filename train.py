@@ -108,7 +108,7 @@ def main(args):
         ignore_index = src_dict.pad_idx, reduction = 'sum')
     
     if torch.cuda.is_available() and args.cuda:
-        print('\n\n1\n\n')
+        print('--\nUsing CUDA.\n--')
         model = model.cuda()
     # Instantiate optimizer and learning rate scheduler
     optimizer = torch.optim.Adam(model.parameters(), args.lr)
