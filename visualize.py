@@ -25,6 +25,7 @@ def get_args():
                         help='path to the model file')
     parser.add_argument('--vis-dir', default='visualizations',
                         help='path to the model file')
+    parser.add_argument('--cuda', default = False, help = 'Use a GPU')
     return parser.parse_args()
 
 
@@ -88,7 +89,7 @@ def main(args):
         attn_records.append((sample, attn_weights))
 
         # Only visualize the first 10 sentence pairs
-        if i >= 10:
+        if i >= 100:
             break
 
     # Generate heat-maps and store them at the designated location

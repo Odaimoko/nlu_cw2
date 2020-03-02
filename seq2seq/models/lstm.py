@@ -435,7 +435,7 @@ class LSTMDecoder(Seq2SeqDecoder):
                     #     weight_sum += step_attn_weights[:, i].repeat(
                     #         src_embeddings.shape[2], 1).transpose(1, 0) * src_embeddings[i]
                     # weight_sum = torch.bmm(src_embeddings.transpose(0, 1).transpose(1, 2),
-                    #                        step_attn_weights.unsqueeze(2)).squeeze()
+                    #                        step_attn_weights.unsqueeze(2)).squeeze() # matrix impl
                     # # ws.append(weight_sum) # debug
                     # flt = torch.tanh(weight_sum)
                     #
@@ -473,6 +473,7 @@ class LSTMDecoder(Seq2SeqDecoder):
             flt = torch.tanh(weighted_sum)
             htl = torch.tanh(self.Lexical_FFNN(flt)) + flt
             lexical_contexts = htl.view(bs, out, es)
+            
             # lexical_contexts = torch.stack(lexical_contexts).transpose(1, 0)
             # print(decoder_output.shape)
             # print(lexical_contexts.shape)
