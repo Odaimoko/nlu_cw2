@@ -166,7 +166,7 @@ class MultiHeadAttention(nn.Module):
         self.k_embed_size = kdim if kdim else embed_dim
         self.v_embed_size = vdim if vdim else embed_dim
 
-        self.num_heads = num_attn_heads
+        self.num_heads = num_attn_heads # h
         self.attention_dropout = dropout
         self.head_embed_size = embed_dim // num_attn_heads  # this is d_k in the paper
         self.head_scaling = math.sqrt(self.head_embed_size)
@@ -194,7 +194,7 @@ class MultiHeadAttention(nn.Module):
         nn.init.constant_(self.out_proj.bias, 0.)
 
 
-# method 1
+        # method 1
         # self.k_proj = nn.Linear(self.k_embed_size, embed_dim * num_attn_heads, bias=True)
         # self.v_proj = nn.Linear(self.v_embed_size, embed_dim * num_attn_heads, bias=True)
         # self.q_proj = nn.Linear(self.k_embed_size, embed_dim * num_attn_heads, bias=True)
