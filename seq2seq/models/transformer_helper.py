@@ -27,7 +27,7 @@ class TransformerEncoderLayer(nn.Module):
     def forward(self, state, encoder_padding_mask):
         """Forward pass of a single Transformer Encoder Layer"""
         residual = state.clone()
-        
+
         # ___QUESTION-7-DESCRIBE-D-START___
         '''
         ___QUESTION-7-DESCRIBE-D-START___
@@ -166,7 +166,7 @@ class MultiHeadAttention(nn.Module):
         self.k_embed_size = kdim if kdim else embed_dim
         self.v_embed_size = vdim if vdim else embed_dim
 
-        self.num_heads = num_attn_heads # h
+        self.num_heads = num_attn_heads  # h
         self.attention_dropout = dropout
         self.head_embed_size = embed_dim // num_attn_heads  # this is d_k in the paper
         self.head_scaling = math.sqrt(self.head_embed_size)
@@ -192,14 +192,6 @@ class MultiHeadAttention(nn.Module):
         nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
         nn.init.xavier_uniform_(self.out_proj.weight)
         nn.init.constant_(self.out_proj.bias, 0.)
-
-
-        # method 1
-        # self.k_proj = nn.Linear(self.k_embed_size, embed_dim * num_attn_heads, bias=True)
-        # self.v_proj = nn.Linear(self.v_embed_size, embed_dim * num_attn_heads, bias=True)
-        # self.q_proj = nn.Linear(self.k_embed_size, embed_dim * num_attn_heads, bias=True)
-        # # self.out_proj = nn.Linear(self.embed_dim, self.embed_dim, bias=True)
-        # self.out_proj = nn.Linear(self.embed_dim * num_attn_heads, self.embed_dim, bias=True)
 
     def forward(self,
                 query,
@@ -231,112 +223,13 @@ class MultiHeadAttention(nn.Module):
         attn_weights = torch.zeros(size=(
             self.num_heads, batch_size, tgt_time_steps, key.size(0))) if need_weights else None
 
-        if torch.cuda.is_available():
-            query = query.cuda()
-            value = value.cuda()
-            key = key.cuda()
-            if need_weights:
-                attn_weights = attn_weights.cuda()
-
-        if key_padding_mask is not None:
-            key_padding_mask = key_padding_mask.transpose(
-                0, 1).contiguous().repeat(embed_dim, 1, 1)
-            key.masked_fill(key_padding_mask.permute(1, 2, 0).bool(), float(0))
-
-        # # method1
-        # t, b, e = query.size()
-        # t_k,_,_ = key.size()
-        # h = self.num_heads
-        # queries = self.q_proj(query).transpose(0, 1).contiguous().view(b, t, h, e)
-        # # print(key_padding_mask is None)
-        # # print(key.shape)
-        # # print(query.shape)
-        # keys = self.k_proj(key).transpose(0, 1).contiguous().view(b, t_k, h, e)
-
-        # values = self.v_proj(value).transpose(0, 1).contiguous().view(b, t_k, h, e)
-
-        # keys = keys.transpose(1, 2).contiguous().view(b * h, t_k, e)
-        # queries = queries.transpose(1, 2).contiguous().view(b * h, t, e)
-        # values = values.transpose(1, 2).contiguous().view(b * h, t_k, e)
-
-        # dot = torch.bmm(queries, keys.transpose(1, 2))/self.head_scaling
-        # assert dot.size() == (b * h, t, t_k)
-        # if attn_mask is not None:
-        #     dot.masked_fill(attn_mask.repeat(b*h,1,1).bool(),float('-inf'))
-
-        # dot = F.softmax(dot, dim=2)
-        # out = torch.bmm(dot, values).view(b, h, t, e)
-        # out = out.transpose(1, 2).contiguous().view(b, t, h * e)
-        # attn = self.out_proj(out).transpose(1,0).contiguous()
-        # assert  attn.size() == (tgt_time_steps, batch_size, embed_dim)
-        # if need_weights is not None:
-        #     attn_weights = dot.view(h, b, t, t_k)
-
-        # method2
-        t_s, b, e = query.size()
-        t_t, _, _ = key.size()
-        h_e = self.head_embed_size
-        h = self.num_heads
-        query = self.q_proj(query).transpose(
-            0, 1).contiguous().view(b, t_s, h, h_e)
-        key = self.k_proj(key).transpose(
-            0, 1).contiguous().view(b, t_t, h, h_e)
-        value = self.v_proj(value).transpose(
-            0, 1).contiguous().view(b, t_t, h, h_e)
-
-        query = query.transpose(1, 2).contiguous().view(b*h, t_s, h_e)
-        key = key.transpose(1, 2).contiguous().view(b*h, t_t, h_e)
-        value = value.transpose(1, 2).contiguous().view(b*h, t_t, h_e)
-        dot = torch.bmm(query, key.transpose(1, 2))/self.head_scaling
-        assert dot.size() == (b * h, t_s, t_t)
-        if attn_mask is not None:
-            dot.masked_fill(attn_mask.repeat(b*h, 1, 1).bool(), float('-inf'))
-
-        dot = F.softmax(dot, dim=2)
-        out = torch.bmm(dot, value).view(b, h, t_s, h_e)
-        out = out.transpose(1, 2).contiguous().view(b, t_s, h * h_e)
-        attn = self.out_proj(out).transpose(1, 0).contiguous()
-        assert attn.size() == (tgt_time_steps, batch_size, embed_dim)
-        if need_weights is not None:
-            attn_weights = dot.view(h, b, t_s, t_t)
-
-        return attn, attn_weights
-
-        # key = key.permute(2, 0, 1)
-        # key.masked_fill(key_padding_mask.bool(), float(0))
-        # key = key.permute(1, 2, 0)
-        # head_list = []
-        # for head in range(self.num_heads):
-        #     Q_p = self.q_proj(query)
-        #     Q_p =Q_p/self.head_scaling
-        #     K_p = self.k_proj(key)
-        #     K_p = K_p/self.head_scaling
-        #     V_p = self.v_proj(value)
-        #     if key_padding_mask is not None:
-        #         K_p = K_p.permute(2, 0, 1)
-        #         K_p.masked_fill(key_padding_mask.bool(), float(0))
-        #         K_p = K_p.permute(1, 2, 0)
-        #
-        #     QK = Q_p.permute(1,0,2).bmm(K_p.permute(1,2,0))
-        #     if attn_mask is not None:
-        #         #QK1 = QK+attn_mask
-        #         QK = QK.masked_fill(attn_mask.bool(),float('-inf'))
-        #     QK = F.softmax(torch.exp(QK),dim = 2)
-        #
-        #     if need_weights:
-        #         attn_weights[head] = QK
-        #
-        #     head_list.append(QK.bmm(V_p.permute(1, 0, 2)))
-        #     # attn_h = torch.exp(QK)).bmm(V_p.permute(1, 0, 2))
-        # concat_h = sum(head_list)/len(head_list)
-        # attn += self.out_proj(concat_h).permute(1,0,2)
-
-        # print(attn_h.shape)
         # TODO: --------------------------------------------------------------------- CUT
 
         '''
         ___QUESTION-8-MULTIHEAD-ATTENTION-END
         '''
+
+        return attn, attn_weights
 
 
 class PositionalEmbedding(nn.Module):
