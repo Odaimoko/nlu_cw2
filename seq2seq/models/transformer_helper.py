@@ -27,7 +27,6 @@ class TransformerEncoderLayer(nn.Module):
     def forward(self, state, encoder_padding_mask):
         """Forward pass of a single Transformer Encoder Layer"""
         residual = state.clone()
-
         
         # ___QUESTION-7-DESCRIBE-D-START___
         '''
@@ -205,7 +204,6 @@ class MultiHeadAttention(nn.Module):
         tgt_time_steps, batch_size, embed_dim = query.size()
         assert self.embed_dim == embed_dim
 
-        
         # ___QUESTION-8-MULTIHEAD-ATTENTION-START
         '''
         ___QUESTION-8-MULTIHEAD-ATTENTION-START

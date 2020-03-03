@@ -69,7 +69,7 @@ class TransformerEncoder(Seq2SeqEncoder):
 
         self.dropout = args.dropout
         self.embed_dim = args.encoder_embed_dim
-        self.padding_idx = dictionary.pad_idx
+        self.padding_idx = dictionary.pad_idx # 0
         self.max_src_positions = args.max_src_positions
         self.embedding = generate_embedding(len(dictionary), self.embed_dim, dictionary.pad_idx)
         self.embed_scale = 1.0 if args.no_scale_embedding else math.sqrt(self.embed_dim)
@@ -120,7 +120,7 @@ class TransformerEncoder(Seq2SeqEncoder):
 
         # Compute padding mask for attention
         encoder_padding_mask = src_tokens.eq(self.padding_idx)
-        if not encoder_padding_mask.any():
+        if not encoder_padding_mask.any(): # All False -> None
             encoder_padding_mask = None
 
         # Forward pass through each Transformer Encoder Layer
@@ -262,6 +262,7 @@ class TransformerDecoder(Seq2SeqDecoder):
     def buffered_future_mask(self, tensor):
         dim = tensor.size(0)
         if (not hasattr(self, '_future_mask')) or self._future_mask is None or self._future_mask.size(0) < dim:
+            # initialize
             self._future_mask = torch.triu(fill_with_neg_inf(tensor.new(dim, dim)), 1)
         return self._future_mask[:dim, :dim]
 

@@ -12,7 +12,8 @@ from seq2seq import models, utils
 from seq2seq.data.dictionary import Dictionary
 from seq2seq.data.dataset import Seq2SeqDataset, BatchSampler
 from seq2seq.models import ARCH_MODEL_REGISTRY, ARCH_CONFIG_REGISTRY
-
+import multiprocessing
+multiprocessing.set_start_method('spawn', True)
 
 def get_args():
     """ Defines training-specific hyper-parameters. """
