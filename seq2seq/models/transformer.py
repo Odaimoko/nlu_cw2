@@ -178,7 +178,7 @@ class TransformerDecoder(Seq2SeqDecoder):
             if positions is not None:
                 positions = positions[:, -1:]
 
-        forward_state = self.embed_scale * self.embedding(tgt_inputs)
+        forward_state = self.embed_scale * self.embedding(tgt_inputs) # padded entries are 0
         forward_state += positions
         forward_state = F.dropout(forward_state, p=self.dropout, training=self.training)
 

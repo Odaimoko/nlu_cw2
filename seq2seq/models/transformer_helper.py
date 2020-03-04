@@ -236,7 +236,7 @@ class MultiHeadAttention(nn.Module):
             q_split = q.view(-1, self.num_heads, self.head_embed_size).transpose(0, 1)
             k_split = k.view(-1, self.num_heads, self.head_embed_size).transpose(0, 1)
             v_split = v.view(-1, self.num_heads, self.head_embed_size).transpose(0, 1)
-            qk_T_split = torch.bmm(q_split, k_split.transpose(1, 2))
+            qk_T_split = torch.bmm(q_split, k_split.transpose(1, 2)) / self.head_scaling
             qk_T_split[:, :, mask[i]] = -float('inf')
             if attn_mask is not None:  # d_q x d_k
                 qk_T_split += attn_mask
@@ -252,8 +252,6 @@ class MultiHeadAttention(nn.Module):
             #     QK_T += attn_mask
             # weights = F.softmax(QK_T, dim = 1)
             attn_list.append(concat_vec)
-            # if need_weights: # abandon
-            #     attn_weights[:,i,:,:] =
         # qtk = torch.stack(qkt)
         # QK_T_bmm = torch.bmm(q_prjed, k_prjed.transpose(1,2)) / self.head_scaling
         attn = torch.stack(attn_list, dim = 1)
