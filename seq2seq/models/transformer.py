@@ -124,6 +124,7 @@ class TransformerEncoder(Seq2SeqEncoder):
             encoder_padding_mask = None
 
         # Forward pass through each Transformer Encoder Layer
+        # Oda: forward_state is initially the embedding. And then the output of the last transformer block.
         for layer in self.layers:
             forward_state = layer(state=forward_state, encoder_padding_mask=encoder_padding_mask)
 
