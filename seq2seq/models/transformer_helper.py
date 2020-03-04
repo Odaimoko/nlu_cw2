@@ -225,18 +225,19 @@ class MultiHeadAttention(nn.Module):
         q_prjed = self.q_proj(query).transpose(0, 1)  # bs x len sent x (num head x head emb size)
         k_prjed = self.k_proj(key).transpose(0, 1)
         v_prjed = self.v_proj(value).transpose(0, 1)
+        # if no padding mask is specified, assign nothing to -inf
         mask = torch.zeros(batch_size, key.size(0)).bool()
         if key_padding_mask is not None:
             mask = key_padding_mask
         attn_list = []
         
-        qkt = []
-        for i, data in enumerate(zip(q_prjed, k_prjed, v_prjed)):
-            (q, k, v) = data
+        for i, data in enumerate(zip(q_prjed, k_prjed, v_prjed)): # within one batch
+            (q, k, v) = data # the size is (time steps x embed size)
             q_split = q.view(-1, self.num_heads, self.head_embed_size).transpose(0, 1)
             k_split = k.view(-1, self.num_heads, self.head_embed_size).transpose(0, 1)
             v_split = v.view(-1, self.num_heads, self.head_embed_size).transpose(0, 1)
             qk_T_split = torch.bmm(q_split, k_split.transpose(1, 2)) / self.head_scaling
+            # drop out before softmax, but mask should be applied properly
             qk_T_split=F.dropout(qk_T_split,p=self.attention_dropout,training=self.training)
             qk_T_split[:, :, mask[i]] = -float('inf')
             if attn_mask is not None:  # d_q x d_k
@@ -244,16 +245,10 @@ class MultiHeadAttention(nn.Module):
             weights = F.softmax(qk_T_split, dim = 2)
             if need_weights:
                 attn_weights[:, i, :, :] = weights
-            linear_comb = torch.bmm(weights, v_split)
+            # linear combination of value vectors
+            linear_comb = torch.bmm(weights, v_split) # num head x time steps x head embed size
             concat_vec = torch.cat([vec for vec in linear_comb], dim = 1)
-            # QK_T = q.mm(k.T) / self.head_scaling  # len sent x len sent
-            # # qkt.append(QK_T.clone())
-            # QK_T[:, mask[i]] = -float('inf')
-            # if attn_mask is not None:
-            #     QK_T += attn_mask
-            # weights = F.softmax(QK_T, dim = 1)
             attn_list.append(concat_vec)
-        # qtk = torch.stack(qkt)
         # QK_T_bmm = torch.bmm(q_prjed, k_prjed.transpose(1,2)) / self.head_scaling
         attn = torch.stack(attn_list, dim = 1)
         attn = self.out_proj(attn)

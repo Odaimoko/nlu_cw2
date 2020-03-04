@@ -22,8 +22,7 @@ python train.py --save-dir "${EXP_ROOT}" \
                 --data "${DATA_DIR}" \
                 --max-epoch 150 \
                 --encoder-num-layers 2 --decoder-num-layers 3 --cuda True \
-                --patience 20
-
+                --restore-file "checkpoint_best.pt"
                 ### ADDITIONAL ARGUMENTS HERE ###
 
 ## Prediction step
