@@ -1,5 +1,5 @@
-[2020-02-28 17:19:37] COMMAND: translate.py --checkpoint-path /home/lvyajie/nlu_cw2/result/Q7/checkpoint_best.pt --output /home/lvyajie/nlu_cw2/result/Q7/model_translations.txt --cuda True
-[2020-02-28 17:19:37] Arguments: {'activation_dropout': 0.4,
+[2020-03-01 20:02:59] COMMAND: translate.py --checkpoint-path /home/lvyajie/nlu_cw2/result/Q7/checkpoint_best.pt --output /home/lvyajie/nlu_cw2/result/Q7/model_translations.txt --cuda True
+[2020-03-01 20:02:59] Arguments: {'activation_dropout': 0.4,
  'arch': 'transformer',
  'attention_dropout': 0.4,
  'batch_size': 10,
@@ -36,7 +36,7 @@
  'source_lang': 'de',
  'target_lang': 'en',
  'train_on_tiny': False}
-[2020-02-28 17:19:37] Loaded a source dictionary (de) with 5047 words
-[2020-02-28 17:19:37] Loaded a target dictionary (en) with 4420 words
-[2020-02-28 17:19:41] Loaded a model from checkpoint /home/lvyajie/nlu_cw2/result/Q7/checkpoint_best.pt
-[2020-02-28 17:19:53] Output 500 translations to /home/lvyajie/nlu_cw2/result/Q7/model_translations.txt
+[2020-03-01 20:02:59] Loaded a source dictionary (de) with 5047 words
+[2020-03-01 20:02:59] Loaded a target dictionary (en) with 4420 words
+[2020-03-01 20:03:04] Loaded a model from checkpoint /home/lvyajie/nlu_cw2/result/Q7/checkpoint_best.pt
+[2020-03-01 20:03:13] Output 500 translations to /home/lvyajie/nlu_cw2/result/Q7/model_translations.txt
